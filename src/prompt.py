@@ -28,8 +28,8 @@ def generate_instruction_prompt(sql_dialect):
         """
 
 
-def generate_combined_prompts_one(db_path, question, sql_dialect, knowledge=None):
-    schema_prompt = generate_schema_prompt(sql_dialect, db_path)
+def generate_combined_prompts_one(db_path, question, sql_dialect, knowledge=None, num_rows=None):
+    schema_prompt = generate_schema_prompt(sql_dialect, db_path, num_rows=num_rows)
     comment_prompt = generate_comment_prompt(question, sql_dialect, knowledge)
     cot_prompt = generate_cot_prompt(sql_dialect)
     instruction_prompt = generate_instruction_prompt(sql_dialect)

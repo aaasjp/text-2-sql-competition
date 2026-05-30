@@ -33,3 +33,21 @@ python working/smolagent_demo.py \
   --db_id debit_card_specializing \
   --question "What is the ratio of EUR vs CZK customers?" \
   --evidence "ratio = count(EUR) / count(CZK)"
+
+
+# smolagent Text2SQL（working/smolagent_text2sql.py）
+# 执行日志: working/run_agent.log（含 agent 步骤与终端输出）
+# 中间结果: working/predictions/prediction_sql.json
+# 运行结束后自动导出评估 JSON: exp_result/agent_out/predict_mini_dev_dev_{MODEL}_cot_SQLite.json
+
+# 串行（默认）
+python smolagent_text2sql.py --question all --db_id debit_card_specializing
+
+# 4 线程并行
+python smolagent_text2sql.py --question all --db_id debit_card_specializing --workers 4
+
+# 仅跑 agent、不写评估 JSON
+python smolagent_text2sql.py --question all --no-export
+
+# 评估 agent 预测（需与 .env 中 MODEL 一致，或设置 MODEL=...）
+cd .. && bash run/run_eval_agent.sh

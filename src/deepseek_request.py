@@ -216,6 +216,7 @@ def collect_response_from_deepseek(
     knowledge_list=None,
     question_id_list=None,
     db_id_list=None,
+    num_rows=None,
 ):
     """
     Collect responses from DeepSeek using multiple threads.
@@ -229,6 +230,7 @@ def collect_response_from_deepseek(
                 question=question_list[i],
                 sql_dialect=sql_dialect,
                 knowledge=knowledge_list[i] if knowledge_list else None,
+                num_rows=num_rows,
             ),
             engine,
             client,
@@ -263,6 +265,7 @@ if __name__ == "__main__":
     args_parser.add_argument("--data_output_path", type=str)
     args_parser.add_argument("--chain_of_thought", type=str, default="True")
     args_parser.add_argument("--num_processes", type=int, default=3)
+    args_parser.add_argument("--num_rows", type=int, default=None)
     args_parser.add_argument("--sql_dialect", type=str, default="SQLite")
     args = args_parser.parse_args()
 
@@ -292,6 +295,7 @@ if __name__ == "__main__":
             knowledge_list,
             question_id_list,
             db_id_list,
+            num_rows=args.num_rows,
         )
     else:
         responses = collect_response_from_deepseek(
@@ -302,6 +306,7 @@ if __name__ == "__main__":
             args.num_processes,
             question_id_list=question_id_list,
             db_id_list=db_id_list,
+            num_rows=args.num_rows,
         )
 
     if args.chain_of_thought == "True":
