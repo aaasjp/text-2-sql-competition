@@ -1,0 +1,12 @@
+# Text2SQL 挑战赛核心依赖
+openai>=1.0.0
+tqdm
+func_timeout
+python-dotenv
+
+# 可选：MySQL / PostgreSQL 方言支持（默认使用 SQLite，可不装）
+pymysql>=1.1.0
+psycopg2-binary>=2.9.9
+
+# smolagents 本地 editable 安装（需先 git clone 到 working/smolagents）
+-e ./smolagents[openai,toolkit]

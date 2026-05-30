@@ -1,0 +1,702 @@
+[
+  {
+    "question_id": 1471,
+    "db_id": "debit_card_specializing",
+    "question": "What is the ratio of customers who pay in EUR against customers who pay in CZK?",
+    "evidence": "ratio of customers who pay in EUR against customers who pay in CZK = count(Currency = 'EUR') / count(Currency = 'CZK').",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1500,
+    "db_id": "debit_card_specializing",
+    "question": "Please list the product description of the products consumed in September, 2013.",
+    "evidence": "September 2013 refers to 201309; The first 4 strings of the Date values in the yearmonth table can represent year; The 5th and 6th string of the date can refer to month.",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1505,
+    "db_id": "debit_card_specializing",
+    "question": "Among the customers who paid in euro, how many of them have a monthly consumption of over 1000?",
+    "evidence": "Pays in euro = Currency = 'EUR'.",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1507,
+    "db_id": "debit_card_specializing",
+    "question": "Please list the disparate time of the transactions taken place in the gas stations from chain no. 11.",
+    "evidence": "",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1533,
+    "db_id": "debit_card_specializing",
+    "question": "For all the people who paid more than 29.00 per unit of product id No.5. Give their consumption status in the August of 2012.",
+    "evidence": "August of 2012 refers to the Date value = '201208' ; Price per unit of product = Price / Amount;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1350,
+    "db_id": "student_club",
+    "question": "What is the status of the event which bought \"Post Cards, Posters\" on 2019/8/20?",
+    "evidence": "'Post Cards, Posters' is an expense description; on 2019/8/20 refers to expense_date = '2019-8-20'; status of event refers to event_status",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1356,
+    "db_id": "student_club",
+    "question": "Which department was the President of the club in?",
+    "evidence": "'President' is a position of Student Club",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1361,
+    "db_id": "student_club",
+    "question": "What is the total cost of the pizzas for all the events?",
+    "evidence": "total cost of the pizzas refers to SUM(cost) where expense_description = 'Pizza'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1362,
+    "db_id": "student_club",
+    "question": "How many cities are there in Orange County, Virginia?",
+    "evidence": "Orange County is the county name, Virginia is the state name",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1376,
+    "db_id": "student_club",
+    "question": "Among all the closed events, which event has the highest spend-to-budget ratio?",
+    "evidence": "closed events refers to event_name where status = 'Closed'; highest spend-to budget ratio refers to MAX(DIVIDE(spent, amount))",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1378,
+    "db_id": "student_club",
+    "question": "What is the highest amount of budget spend for an event?",
+    "evidence": "highest amount of budget spend refers to MAX(spent)",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1389,
+    "db_id": "student_club",
+    "question": "Which event has the lowest cost?",
+    "evidence": "event refers to event_name; lowest cost means MIN(cost)",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1390,
+    "db_id": "student_club",
+    "question": "Based on the total cost for all event, what is the percentage of cost for Yearly Kickoff event?",
+    "evidence": "percentage = DIVIDE(SUM(cost where event_name = 'Yearly Kickoff'), SUM(cost)) * 100",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1398,
+    "db_id": "student_club",
+    "question": "Name the event with the highest amount spent on advertisement.",
+    "evidence": "Name of event refers to event_name; highest amount spent on advertisement refers to MAX(spent) where category = 'Advertisement'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1399,
+    "db_id": "student_club",
+    "question": "Did Maya Mclean attend the 'Women's Soccer' event?",
+    "evidence": "Maya Mclean is the full name; full name refers to first_name, last_name; 'Women's Soccer' is an event_name",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1401,
+    "db_id": "student_club",
+    "question": "Indicate the cost of posters for 'September Speaker' event.",
+    "evidence": "'Posters' is the expense description; 'September Speaker' is an event name",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1427,
+    "db_id": "student_club",
+    "question": "What are the budget category of the events located at MU 215 and a guest speaker type with a 0 budget spent?",
+    "evidence": "budget category refers to category; events located at refers to location; type = 'Guest Speaker'; 0 budget spent refers to spent = 0; ",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1153,
+    "db_id": "thrombosis_prediction",
+    "question": "What is the disease patient '30609' diagnosed with. List all the date of laboratory tests done for this patient.",
+    "evidence": "'30609' is the Patient ID; disease means Diagnosis",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1164,
+    "db_id": "thrombosis_prediction",
+    "question": "How many of the patients with the most serious thrombosis cases examined in 1997 are women?",
+    "evidence": "the most serious thrombosis refers to Thrombosis = '1' (the most severe one); women refers to sex = 'F'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1168,
+    "db_id": "thrombosis_prediction",
+    "question": "The oldest SJS patient's medical laboratory work was completed on what date, and what age was the patient when they initially arrived at the hospital?",
+    "evidence": "The larger the birthday value, the younger the person is, and vice versa; 'SJS' refers to diagnosis; (SUBTRACT(year(`First Date`)), year(Birthday)); age of the patients when they initially arrived at the hospital refers to year(Birthday)",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1179,
+    "db_id": "thrombosis_prediction",
+    "question": "For the patient who was diagnosed with SLE on 1994/2/19, what was his/her anti-Cardiolipin antibody concentration status on 1993/11/12?",
+    "evidence": "diagnosed with SLE refers to Diagnosis = 'SLE'; 1994/2/19 refers to Description = '1994-02-19'; anti-Cardiolipin refers to aCL IgM; 1993/11/12 refers to Examination Date = '1993/11/12'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1227,
+    "db_id": "thrombosis_prediction",
+    "question": "What is the average age of the male patient with high cholesterol?",
+    "evidence": "average age = DIVIDE(SUM(SUBTRACT(YEAR(NOW()), YEAR(birthday))), COUNT(ID)); male patient refers to sex = 'M'; high cholesterol refers to `T-CHO` > = 250;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1243,
+    "db_id": "thrombosis_prediction",
+    "question": "For all patients who are older than 55 years old, what is the percentage of female who has abnormal prothrombin time (PT)?",
+    "evidence": "older than 55 years old = SUBTRACT(year(current_timestamp), year(Birthday)) > 55; abnormal prothrombin time (PT) refers to PT > = 14; percentage = DIVIDE(SUM(PT > = 14 AND SEX = 'F'), SUM(PT > = 14)) * 100; female refers to sex = 'F'; ",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1247,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the male patients who have a normal level of white blood cells, how many of them have an abnormal fibrinogen level?",
+    "evidence": "male patients refers to Sex = 'M'; normal level of white blood cells refers to WBC > 3.5 and WBC <9.0; abnormal fibrinogen level refers to FG < = 150 or FG > = 450; Don't compute repetitive ones.",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1255,
+    "db_id": "thrombosis_prediction",
+    "question": "For the patients with an abnormal Ig M level, what is the most common disease they are diagnosed with?",
+    "evidence": "abnormal Ig M level refers to IGM <=40 OR IGM >= 400; most common disease refers to MAX(COUNT(Diagnosis));",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1267,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients with normal anti-SM, how many of them does not have thrombosis?",
+    "evidence": "normal anti-SM refers to SM IN('-', '+-'); SM = 'negative' means '-'; SM = '0' means '+-'; SM = '1' means '+'; does not have thrombosis refers to Thrombosis = 0;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1275,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients who has a normal level of anti-centromere and a normal level of anti-SSB, how many of them are male?",
+    "evidence": "normal level of anti-centromere refers to CENTROMEA IN('-', '+-'); normal level of anti-SSB refers to SSB IN('-', '+-'); male refers to Sex = 'M'; Should consider DISTINCT in the final result;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1031,
+    "db_id": "european_football_2",
+    "question": "At present, calculate for the player's age who have a sprint speed of no less than 97 between 2013 to 2015.",
+    "evidence": "players age at present = SUBTRACT((DATETIME(), birthday)); sprint speed of no less than 97 refers to sprint_speed > = 97; between 2013 to 2015 refers to YEAR(date) > = '2013' AND YEAR(date) < = '2015'; ",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1037,
+    "db_id": "european_football_2",
+    "question": "Calculate the percentage of players who prefer left foot, who were born between 1987 and 1992.",
+    "evidence": "players who prefer left foot refers to preferred_foot = 'left'; percentage of players who prefer left foot = DIVIDE(MULTIPLY((SUM(preferred_foot = 'left'), 100)), COUNT(player_fifa_api_id)); born between 1987 and 1992 refers to YEAR(birthday) BETWEEN '1987' AND '1992';",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1068,
+    "db_id": "european_football_2",
+    "question": "From 2010 to 2015, what was the average overall rating of players who are higher than 170?",
+    "evidence": "from 2010 to 2015 refers to strftime('%Y', date) >= '2010' AND <= '2015'; average overall rating = SUM(t2.overall_rating)/ COUNT(t2.id); higher than 170 refers to Player.height > 170;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1076,
+    "db_id": "european_football_2",
+    "question": "What is the difference of the average ball control score between Abdou Diallo and Aaron Appindangoye\n?",
+    "evidence": "difference of the average ball control = SUBTRACT(AVG(ball_control WHERE player_name = 'Abdou Diallo'), AVG(ball_control WHERE player_name = 'Aaron Appindangoye')); AVG(ball_control WHERE player_name = 'XX XX') = SUM(CASE WHEN player_name = 'XX XX' THEN ball_control ELSE 0 END) / COUNT(CASE WHEN player_name = 'XX XX' THEN id ELSE NULL END)",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1096,
+    "db_id": "european_football_2",
+    "question": "Calculate the average overall rating of Pietro Marino.",
+    "evidence": "Pietro Marino refers to player_name = 'Pietro Marino'; average overall rating AVG(T1.overall_rating)",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1103,
+    "db_id": "european_football_2",
+    "question": "What was the overall rating for Aaron Mooy on 2016/2/4?",
+    "evidence": "Aaron Mooy refers to player_name = 'Aaron Mooy'; on 2016/2/4 refers to date LIKE '2016-02-04%';",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1105,
+    "db_id": "european_football_2",
+    "question": "How was Francesco Migliore's attacking work rate on 2015/5/1?",
+    "evidence": "Francesco Migliore refers to player_name = 'Francesco Migliore'; on 2015/5/1 refers to date LIKE '2015-05-01%';",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1114,
+    "db_id": "european_football_2",
+    "question": "What was the average overall rating for Marko Arnautovic from 2007/2/22 to 2016/4/21?",
+    "evidence": "average overall rating refers to avg(overall_rating); Marko Arnautovic refers to player_name = 'Marko Arnautovic'; from 2007/2/22 to 2016/4/21 refers to the first 10 characters of date BETWEEN '2007-02-22' and '2016-04-21'",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1122,
+    "db_id": "european_football_2",
+    "question": "State the name of the most strongest player.",
+    "evidence": "strongest players refers to player has MAX(overall_rating)",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1147,
+    "db_id": "european_football_2",
+    "question": "Please name one player whose overall strength is the greatest.",
+    "evidence": "overall strength is the greatest refers to MAX(overall_rating)",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 846,
+    "db_id": "formula_1",
+    "question": "Please list the reference names of the drivers who are eliminated in the first period in race number 20.",
+    "evidence": "driver reference name refers to driverRef; first qualifying period refers to q1; drivers who are eliminated in the first qualifying period refers to 5 drivers with MAX(q1); race number refers to raceId;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 847,
+    "db_id": "formula_1",
+    "question": "What is the surname of the driver with the best lap time in race number 19 in the second qualifying period?",
+    "evidence": "race number refers to raceId; second qualifying period refers to q2; best lap time refers to MIN(q2);",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 850,
+    "db_id": "formula_1",
+    "question": "Please give the name of the race held on the circuits in Germany.",
+    "evidence": "Germany is a name of country;",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 857,
+    "db_id": "formula_1",
+    "question": "Give the coordinate position for Abu Dhabi Grand Prix.",
+    "evidence": "coordinate position/location refers to lat, lng; Abu Dhabi Grand Prix refers to races.name = 'Abu Dhabi Grand Prix'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 862,
+    "db_id": "formula_1",
+    "question": "For the Bahrain Grand Prix in 2007, how many drivers not finished the game?",
+    "evidence": "Bahrain Grand Prix refers to races.name = 'Bahrain Grand Prix'; drivers who finished the race refers to time is not empty (i.e. time IS NOT NULL);",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 865,
+    "db_id": "formula_1",
+    "question": "For all the drivers who finished the game in race No. 592, who is the oldest?",
+    "evidence": "drivers who finished the race refers to time is not empty (i.e. time IS NOT NULL); race number refers to raceId; date of birth refers to drivers.dob; The larger the birthday value, the younger the person is, and vice versa;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 866,
+    "db_id": "formula_1",
+    "question": "Who was the player that got the lap time of 0:01:27 in the race No. 161? Show his introduction website.",
+    "evidence": "player and driver are synonyms; the lap time of 0:0M:SS refers to lapTime.time LIKE 'M:SS%';race number refers to raceId; introduction website of the drivers refers to url;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 879,
+    "db_id": "formula_1",
+    "question": "For the driver who set the fastest lap speed, what is his nationality?",
+    "evidence": "the fastest lap speed refers to (MAX) fastestLapSpeed;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 881,
+    "db_id": "formula_1",
+    "question": "For the drivers who took part in the race in 1983/7/16, what's their race completion rate?",
+    "evidence": "DIVIDE(COUNT(driverid when time has value ), (COUNT(driverid )) as percentage; in 1983/7/16 refers to when date = '1983-07-16'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 884,
+    "db_id": "formula_1",
+    "question": "List the names of all races that occurred in the earliest recorded year and month.",
+    "evidence": "earliest recorded year and month refers to year = year(min(date)) and month = month(min(date));",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 892,
+    "db_id": "formula_1",
+    "question": "State the driver with the most points scored. Find his full name with that points.",
+    "evidence": "the most points scored refers to max(points); Full name of the driver refers to drivers.forename and drivers.surname;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 895,
+    "db_id": "formula_1",
+    "question": "What is the average lap time for Lewis Hamilton in the 2009 Malaysian Grand Prix?",
+    "evidence": "average lap time = AVG(milliseconds); 'Lewis Hamilton' refers to the full name of the driver; Full name of the driver refers to drivers.forename and drivers.surname; 'Malaysian Grand Prix' refers to races.name = 'Malaysian Grand Prix'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 897,
+    "db_id": "formula_1",
+    "question": "Name the driver with the most winning. Mention his nationality and what is his maximum point scores.",
+    "evidence": "Full name of the driver refers to drivers.forename and drivers.surname; the most winning refers to MAX(COUNT(wins)); average point scores refers to MAX(points);",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 912,
+    "db_id": "formula_1",
+    "question": "What's the reference name of Marina Bay Street Circuit?",
+    "evidence": "reference name refers to circuitRef; Marina Bay Street Circuit refers to circuits.name = 'Marina Bay Street Circuit'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 948,
+    "db_id": "formula_1",
+    "question": "What are the maximum points of British constructors?",
+    "evidence": "maximum points = MAX(points); British is a nationality",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 981,
+    "db_id": "formula_1",
+    "question": "On what year did the youngest driver had his first qualifying race? Also state the name, date and time of the race.",
+    "evidence": "date of birth refers to drivers.dob; The larger the birthday value, the younger the person is, and vice versa; first qualifying race refers to MIN(races.date);",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 994,
+    "db_id": "formula_1",
+    "question": "Which constructor scored most points from Monaco Grand Prix between 1980 and 2010? List the score, name and nationality of this team.",
+    "evidence": "Monaco Grand Priz refers to the race; race in year between 1980 and 2010",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1014,
+    "db_id": "formula_1",
+    "question": "Please list the lap records for the circuits in Italy.",
+    "evidence": "lap record means the fastest time recorded which refers to time",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 732,
+    "db_id": "superhero",
+    "question": "Which publisher published the slowest superhero?",
+    "evidence": "the slowest superhero refers to attribute_name = 'Speed' where MIN(attribute_value); publisher refers to publisher_name",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 733,
+    "db_id": "superhero",
+    "question": "How many gold-eyed superheroes did Marvel Comics publish?",
+    "evidence": "gold-eyed refers to colour = 'Gold' where eye_colour_id = colour.id; superheroes that Marvel Comics published refers to publisher_name = 'Marvel Comics'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 750,
+    "db_id": "superhero",
+    "question": "What is the average weight of all female superheroes?",
+    "evidence": "female refers to gender = 'Female'; average weight refers to AVG(weight_kg)",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 806,
+    "db_id": "superhero",
+    "question": "Provide the eye colour of the superhero who has Karen Beecher-Duncan as their full name.",
+    "evidence": "eye colour refers to colour.colour where eye_colour_id = colour.id; Karen Beecher-Duncan is the full name of superhero;",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 819,
+    "db_id": "superhero",
+    "question": "In superheroes with missing weight data, calculate the difference between the number of superheroes with blue eyes and no eye color.",
+    "evidence": "missing weight data refers to weight_kg = 0 OR T1.weight_kg = NULL; difference = SUBTRACT(SUM(colour.id = 7), SUM(colour.id = 1)); blue eyes refers to eye_colour_id WHERE colour.id = 7; no eye color refers to eye_colour_id WHERE colour.id = 1;",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 825,
+    "db_id": "superhero",
+    "question": "Identify the gender of the superhero who has the ability of Phoenix Force.",
+    "evidence": "ability of Phoenix Force refers to power_name = 'Phoenix Force';",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 547,
+    "db_id": "codebase_community",
+    "question": "Among the posts owned by an elder user, how many of them have a score of over 19?",
+    "evidence": "elder users refers to Age > 65; Score of over 19 refers to Score > = 20",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 565,
+    "db_id": "codebase_community",
+    "question": "User No.23853 gave a comment to a post at 9:08:18 on 2013/7/12, was that post well-finished?",
+    "evidence": "user no. 23853 refers to UserId = '23853'; at 9:08:18 on 2013/7/12 refers to CreationDate = '2013-07-12 09:08:18.0'; not well-finished refers to ClosedDate IS NULL and vice versa",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 568,
+    "db_id": "codebase_community",
+    "question": "Provide the display name of the user who made the vote No.6347.",
+    "evidence": "vote no. 6347 refers to Id = '6347'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 573,
+    "db_id": "codebase_community",
+    "question": "Write the contents of comments with a score of 17.",
+    "evidence": "score of 17 refers to Score = 17; contents of comments refers to Text",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 587,
+    "db_id": "codebase_community",
+    "question": "Calculate the average view count of each post tagged as 'humor' and list the title and the comment of each post.",
+    "evidence": "tagged as  'humor' refers to tag = '<humor>'; comment of the post refers to Text; average view count = AVG(ViewCount)",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 629,
+    "db_id": "codebase_community",
+    "question": "Calculate the ratio of votes in 2010 and 2011.",
+    "evidence": "DIVIDE(COUNT(Id where YEAR(CreationDate) = 2010), COUNT(Id where YEAR(CreationDate) = 2011)) FROM votes;",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 672,
+    "db_id": "codebase_community",
+    "question": "Among the users located in United Kingdom, how many users whose post have a total favorite amount of 4 or more?",
+    "evidence": "favorite amount of 4 or more refers to FavoriteCount > = 4; Location = 'United Kingdom';",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 678,
+    "db_id": "codebase_community",
+    "question": "Which post by Harvey Motulsky has the most views? Please give the id and title of this post.",
+    "evidence": "DisplayName = 'Harvey Motulsky'; the most views refer to MAX(ViewCount);",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 694,
+    "db_id": "codebase_community",
+    "question": "Provide the text of the latest 10 comments to the post with the title 'Analysing wind data with R' and the display name of the user who left it.",
+    "evidence": "the latest comment refers to MAX(CreationDate);",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 716,
+    "db_id": "codebase_community",
+    "question": "Among the comments with scores between 5 to 10, what is the percentage of the users with 0 up votes?",
+    "evidence": "percentage = DIVIDE(COUNT(UserId where UpVotes = 0 and Score BETWEEN 5 and 10))*100, (COUNT(UserId where Score BETWEEN 5 and 10));",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 345,
+    "db_id": "card_games",
+    "question": "For artifact type of cards that do not have multiple faces on the same card, state its legalities status for vintage play format.",
+    "evidence": "Artifact type of cards refers to types = 'Artifact'; card does not have multiple faces on the same card refers to side is NULL'; vintage play format refers to format = 'vintage';",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 368,
+    "db_id": "card_games",
+    "question": "What is the percentage of borderless cards?",
+    "evidence": "borderless card refers to borderColor = 'borderless'; percentage = Divide(Count (id) where borderColor = 'borderless', Count(id)) *100",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 402,
+    "db_id": "card_games",
+    "question": "What is the percentage of Story Spotlight cards that do not have a text box? List them by their ID.",
+    "evidence": "Story Spotlight cards that do not have a text box refers to isStorylight = 1 and isTextless = 0; Percentage = DIVIDE(SUM(count(id) where isStorylight = 1 AND isTextless = 0 ), SUM(count(id))) * 100",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 416,
+    "db_id": "card_games",
+    "question": "What percentage of cards without power are in French?",
+    "evidence": "in French refers to language = 'French'; cards without power refers to power IS NULL OR power = '*'; percentage = DIVIDE(COUNT(language = 'French' and power is NULL or power = '*'), COUNT( power is NULL or power = '*'))*100",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 422,
+    "db_id": "card_games",
+    "question": "What is the language of the card with the multiverse number 149934?",
+    "evidence": "multiverse number 149934 refers to multiverseid = 149934;",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 468,
+    "db_id": "card_games",
+    "question": "What is the Simplified Chinese translation of the name of the set \"Eighth Edition\"?",
+    "evidence": "Eighth Edition is the name of card set which refers to name = 'Eighth Edition'; Simplified Chinese refers to language = 'Chinese Simplified'; translation of the name refers to translation",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 480,
+    "db_id": "card_games",
+    "question": "What is the Italian flavor text of the card \"Ancestor's Chosen\"?",
+    "evidence": "Italian refers to language = 'Italian'; flavor text refers to flavorText; \"Ancestor''s Chosen\" refers to name = 'Ancestor''s Chosen'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 528,
+    "db_id": "card_games",
+    "question": "List the names of all the cards in the set Hour of Devastation and find the formats in which these cards are legal.",
+    "evidence": "the set Hour of Devastation refers to set.name = 'Hour of Devastation'; names of all the cards in the set refers to cards.name; legal cards refers to status = 'Legal'; the formats refers to format",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 201,
+    "db_id": "toxicology",
+    "question": "What is the percentage of carbon in double-bond molecules?",
+    "evidence": "carbon refers to element = 'c'; double-bond molecules refers to bond_type = '='; percentage = DIVIDE(SUM(element = 'c'), COUNT(atom_id))",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 213,
+    "db_id": "toxicology",
+    "question": "What type of bond is there between the atoms TR004_8 and TR004_20?",
+    "evidence": "type of bond refers to bond_type; between the atoms TR004_8 and TR004_20 refers to atom_id = 'TR004_8' AND atom_id2 = 'TR004_20' OR another way around",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 218,
+    "db_id": "toxicology",
+    "question": "What percentage of carcinogenic-type molecules does not contain fluorine?",
+    "evidence": "label = '+' mean molecules are carcinogenic; contain fluorine refers to element = 'f'; percentage = DIVIDE(SUM(element = 'f') * 100, COUNT(molecule_id)) where label = '+'; Should consider the distinct atoms when counting;",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 231,
+    "db_id": "toxicology",
+    "question": "Which bond type accounted for the majority of the bonds found in molecule TR010 and state whether or not this molecule is carcinogenic?",
+    "evidence": "TR010 is the molecule id; majority of the bond found refers to MAX(COUNT(bond_type)); ",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 240,
+    "db_id": "toxicology",
+    "question": "List all the elements of the toxicology of the molecule \"TR004\".",
+    "evidence": "TR004 is the molecule id;",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 245,
+    "db_id": "toxicology",
+    "question": "What is the average number of bonds the atoms with the element iodine have?",
+    "evidence": "atoms with the element iodine refers to element = 'i'; average = DIVIDE(COUND(bond_id), COUNT(atom_id)) where element = 'i'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 253,
+    "db_id": "toxicology",
+    "question": "List the elements of all the triple bonds.",
+    "evidence": "triple bond refers to bond_type = '#';",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 268,
+    "db_id": "toxicology",
+    "question": "What are the elements for bond id TR001_10_11?",
+    "evidence": "TR001_10_11 is the bond id;",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 281,
+    "db_id": "toxicology",
+    "question": "Tally the toxicology element of the 4th atom of each molecule that was carcinogenic.",
+    "evidence": "label = '+' means molecules are carcinogenic; 4th atom of each molecule refers to substr(atom_id, 7, 1) = '4'; ",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 282,
+    "db_id": "toxicology",
+    "question": "What is the ratio of Hydrogen elements in molecule ID TR006? List the ratio with its label.",
+    "evidence": "hydrogen refers to element = 'h'; ratio = DIVIDE(SUM(element = 'h'), count(element)) where molecule_id = 'TR006' ; label = '+' mean molecules are carcinogenic; label = '-' means molecules are non-carcinogenic",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 17,
+    "db_id": "california_schools",
+    "question": "Rank schools by their average score in Writing where the score is greater than 499, showing their charter numbers.",
+    "evidence": "Valid charter number means the number is not null",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 23,
+    "db_id": "california_schools",
+    "question": "List the names of schools with more than 30 difference in enrollements between K-12 and ages 5-17? Please also give the full street adress of the schools.",
+    "evidence": "Diffrence in enrollement = `Enrollment (K-12)` - `Enrollment (Ages 5-17)`",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 27,
+    "db_id": "california_schools",
+    "question": "What is the average score in writing for the schools that were opened after 1991 or closed before 2000? List the school names along with the score. Also, list the communication number of the schools if there is any.",
+    "evidence": "Communication number refers to phone number.",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 40,
+    "db_id": "california_schools",
+    "question": "What is the telephone number for the school with the lowest average score in reading in Fresno Unified?",
+    "evidence": "Fresno Unified is a name of district;",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 46,
+    "db_id": "california_schools",
+    "question": "Which state special schools have the highest number of enrollees from grades 1 through 12?",
+    "evidence": "State Special Schools refers to DOC = 31; Grades 1 through 12 means K-12",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 79,
+    "db_id": "california_schools",
+    "question": "Between San Diego and Santa Barbara, which county offers the most number of schools that does not offer physical building? Indicate the amount.",
+    "evidence": "'Does not offer physical building' means Virtual = F in the database.",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 83,
+    "db_id": "california_schools",
+    "question": "Of the schools that offers a magnet program serving a grade span of Kindergarten to 8th grade, how many offers Multiple Provision Types? List the number of cities that offers a Kindergarten to 8th grade span and indicate how many schools are there serving such grade span for each city.",
+    "evidence": "Kindergarten to 8th grade refers to K-8; 'Offers a magnet program' means Magnet = 1; Multiple Provision Types refers to `NSLP Provision Status` = 'Multiple Provision Types'",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 99,
+    "db_id": "financial",
+    "question": "Among the accounts who have loan validity more than 12 months, list out the accounts that have the highest approved amount and have account opening date in 1993.",
+    "evidence": "Loan validity more than 12 months refers to duration > 12",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 112,
+    "db_id": "financial",
+    "question": "For the female client who was born in 1976/1/29, which district did she opened her account?",
+    "evidence": "Female refers to gender = 'F'; A2 refers to district names",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 138,
+    "db_id": "financial",
+    "question": "In the branch where the second-highest number of crimes were committed in 1995 occurred, how many male clients are there?",
+    "evidence": "Male refers to gender = 'M'; A15 stands for no. of commited crimes 1995",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 194,
+    "db_id": "financial",
+    "question": "Provide the IDs and age of the client with high level credit card, which is eligible for loans.",
+    "evidence": "the credit card is high-level refers to card.type = 'gold'; eligible for loans refers to disp.type = 'OWNER'",
+    "difficulty": "moderate"
+  }
+]
