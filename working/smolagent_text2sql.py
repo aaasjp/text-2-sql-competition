@@ -2,6 +2,7 @@
 """smolagents Text2SQL Demo — 使用 ToolCallingAgent + BIRD SQLite 数据库。"""
 
 import argparse
+import importlib.resources
 import json
 import sqlite3
 import sys
@@ -10,74 +11,116 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
 import os
 from tqdm import tqdm
 
 WORKING_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = WORKING_DIR.parent
+SRC_DIR = PROJECT_ROOT / "src"
 DB_ROOT = PROJECT_ROOT / "data" / "dev_databases"
 DEV_JSON = PROJECT_ROOT / "data" / "dev.json"
 PREDICTIONS_DIR = WORKING_DIR / "predictions"
 PREDICTION_SQL_PATH = PREDICTIONS_DIR / "prediction_sql.json"
 BIRD_SQL_SEP = "\t----- bird -----\t"
 AGENT_OUT_DIR = PROJECT_ROOT / "exp_result" / "agent_out"
-RUN_AGENT_LOG = WORKING_DIR / "run_agent.log"
+RUN_AGENT_LOG_DIR = WORKING_DIR / "logs"
 SMOLAGENTS_SRC = WORKING_DIR / "smolagents" / "src"
 
 _prediction_lock = threading.Lock()
-_run_log_lock = threading.Lock()
+_thread_log = threading.local()
 
 
-class _TeeStream:
-    """同时写入终端与 run_agent.log（线程安全）。"""
+def get_log_path(question_id: int) -> Path:
+    return RUN_AGENT_LOG_DIR / f"run_agent_{question_id}.log"
 
-    def __init__(self, stream, log_path: Path):
-        self._stream = stream
-        self._log_path = log_path
+
+class _MirrorWriter:
+    """写入日志文件；可选同时镜像到终端（供 Rich Console 使用）。"""
+
+    def __init__(self, log_file, lock: threading.Lock, terminal=None):
+        self._log_file = log_file
+        self._lock = lock
+        self._terminal = terminal
 
     def write(self, data: str) -> int:
         if not data:
             return 0
-        self._stream.write(data)
-        with _run_log_lock:
-            with open(self._log_path, "a", encoding="utf-8") as f:
-                f.write(data)
+        with self._lock:
+            self._log_file.write(data)
+        if self._terminal is not None:
+            self._terminal.write(data)
         return len(data)
 
     def flush(self) -> None:
-        self._stream.flush()
+        with self._lock:
+            self._log_file.flush()
+        if self._terminal is not None:
+            self._terminal.flush()
 
     def isatty(self) -> bool:
-        return self._stream.isatty()
-
-    def fileno(self) -> int:
-        return self._stream.fileno()
+        return False if self._terminal is None else self._terminal.isatty()
 
 
-def setup_run_logging() -> tuple[object, object]:
-    """启用 run_agent.log；返回原始 stdout/stderr 供恢复。"""
-    RUN_AGENT_LOG.parent.mkdir(parents=True, exist_ok=True)
-    with _run_log_lock:
-        with open(RUN_AGENT_LOG, "a", encoding="utf-8") as f:
-            f.write(f"\n{'=' * 60}\n")
-            f.write(f"[{datetime.now().isoformat(timespec='seconds')}] session start\n")
-            f.write(f"{'=' * 60}\n")
-    orig_out, orig_err = sys.stdout, sys.stderr
-    sys.stdout = _TeeStream(orig_out, RUN_AGENT_LOG)
-    sys.stderr = _TeeStream(orig_err, RUN_AGENT_LOG)
-    return orig_out, orig_err
+class QuestionLogSession:
+    """单题日志：经 AgentLogger 写入独立文件，不修改全局 sys.stdout。"""
+
+    def __init__(self, question_id: int, *, mirror_terminal: bool = False):
+        from rich.console import Console
+        from smolagents.monitoring import AgentLogger, LogLevel
+
+        self.question_id = question_id
+        self.log_path = get_log_path(question_id)
+        self._lock = threading.Lock()
+        RUN_AGENT_LOG_DIR.mkdir(parents=True, exist_ok=True)
+        self._log_file = open(self.log_path, "a", encoding="utf-8")
+        self._write_raw(
+            f"\n{'=' * 60}\n"
+            f"[{datetime.now().isoformat(timespec='seconds')}] "
+            f"question_id={question_id} start\n"
+            f"{'=' * 60}\n"
+        )
+        terminal = sys.__stdout__ if mirror_terminal else None
+        writer = _MirrorWriter(self._log_file, self._lock, terminal=terminal)
+        console = Console(file=writer, width=120, highlight=False)
+        self.logger = AgentLogger(level=LogLevel.INFO, console=console)
+
+    def _write_raw(self, text: str) -> None:
+        with self._lock:
+            self._log_file.write(text)
+
+    def log_line(self, text: str) -> None:
+        line = text if text.endswith("\n") else f"{text}\n"
+        with self._lock:
+            self._log_file.write(line)
+        print(text, file=sys.__stdout__)
+
+    def close(self) -> None:
+        self._write_raw(
+            f"[{datetime.now().isoformat(timespec='seconds')}] "
+            f"question_id={self.question_id} end\n"
+        )
+        self._log_file.close()
 
 
-def teardown_run_logging(orig_out: object, orig_err: object) -> None:
-    sys.stdout.flush()
-    sys.stderr.flush()
-    sys.stdout, sys.stderr = orig_out, orig_err
-    with _run_log_lock:
-        with open(RUN_AGENT_LOG, "a", encoding="utf-8") as f:
-            f.write(f"[{datetime.now().isoformat(timespec='seconds')}] session end\n")
+def _start_question_log(question_id: int, *, mirror_terminal: bool) -> QuestionLogSession:
+    session = QuestionLogSession(question_id, mirror_terminal=mirror_terminal)
+    _thread_log.session = session
+    return session
+
+
+def _end_question_log() -> None:
+    session = getattr(_thread_log, "session", None)
+    if session is not None:
+        session.close()
+        _thread_log.session = None
+
 
 load_dotenv(WORKING_DIR / ".env")
+
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 try:
     from smolagents import OpenAIModel, ToolCallingAgent, tool
@@ -90,6 +133,18 @@ except ImportError:
             "未找到 smolagents，请先安装:\n"
             "  cd working && pip install -r requirements.txt"
         ) from None
+
+from deepseek_request import SYSTEM_PROMPT, build_thinking_kwargs  # noqa: E402
+
+
+def _load_agent_prompt_templates() -> dict:
+    prompt_templates = yaml.safe_load(
+        importlib.resources.files("smolagents.prompts")
+        .joinpath("toolcalling_agent.yaml")
+        .read_text()
+    )
+    prompt_templates["system_prompt"] = SYSTEM_PROMPT
+    return prompt_templates
 
 
 def _save_prediction_sql(db_id: str, question_id: int, sql: str) -> None:
@@ -134,7 +189,11 @@ def build_sql_tools(db_id: str, question_id: int):
 
     @tool
     def list_db_tables() -> str:
-        """列出当前数据库中的所有表名。"""
+        """List all user tables in the current SQLite database.
+
+        Returns:
+            str: Comma-separated table names (excludes sqlite_sequence).
+        """
         conn = sqlite3.connect(get_db_path(db_id))
         cursor = conn.cursor()
         cursor.execute(
@@ -145,19 +204,27 @@ def build_sql_tools(db_id: str, question_id: int):
         return ", ".join(tables)
 
     @tool
-    def get_table_schema(table_names: list[str]) -> str:
-        """获取一张或多张表的 CREATE TABLE 语句。
+    def get_table_schema(table_names: str | list[str]) -> str:
+        """Return CREATE TABLE DDL for one or more tables.
 
         Args:
-            table_names: 表名列表，可一次传入多张表
+            table_names: A single table name, or a list of table names to inspect.
+
+        Returns:
+            str: CREATE TABLE statements prefixed with `-- table_name`, joined by blank lines.
         """
-        if not table_names:
+        if isinstance(table_names, str):
+            names = [table_names.strip()] if table_names.strip() else []
+        else:
+            names = [name.strip() for name in table_names if name and str(name).strip()]
+
+        if not names:
             return "错误: table_names 不能为空"
 
         conn = sqlite3.connect(get_db_path(db_id))
         cursor = conn.cursor()
         sections: list[str] = []
-        for table_name in table_names:
+        for table_name in names:
             cursor.execute(
                 "SELECT sql FROM sqlite_master WHERE type='table' AND name=?",
                 (table_name,),
@@ -172,10 +239,15 @@ def build_sql_tools(db_id: str, question_id: int):
 
     @tool
     def execute_sql(sql: str) -> str:
-        """在当前 SQLite 数据库上执行 SELECT 查询并返回结果。
+        """Run a read-only SELECT query on the current database and return rows.
+
+        Only SELECT is allowed. At most 30 rows are returned.
 
         Args:
-            sql: 要执行的 SELECT 语句
+            sql: SQLite SELECT statement to execute.
+
+        Returns:
+            str: Pipe-separated result table, or a no-rows / error message.
         """
         if not sql.strip().upper().startswith("SELECT"):
             return "错误: 仅允许 SELECT 查询"
@@ -203,10 +275,15 @@ def build_sql_tools(db_id: str, question_id: int):
 
     @tool
     def record_final_sql(sql: str) -> str:
-        """记录产生最终答案的 SQL 查询。在调用 final_answer 之前必须调用此工具。
+        """Persist the final SELECT that produces the answer for evaluation export.
+
+        Must be called once before final_answer.
 
         Args:
-            sql: 产生最终查询结果的 SELECT 语句
+            sql: Final SELECT statement that yields the answer.
+
+        Returns:
+            str: Confirmation that the SQL was saved for this question_id.
         """
         _save_prediction_sql(db_id, question_id, sql)
         return f"已记录 question_id={question_id} 的最终 SQL"
@@ -219,25 +296,35 @@ def build_agent(
     question_id: int,
     max_steps: int = 50,
     planning_interval: int | None = None,
+    logger=None,
+    enable_thinking: bool = True,
 ) -> ToolCallingAgent:
     cfg = get_llm_config()
     if not cfg["api_key"]:
         raise SystemExit("请在 working/.env 中配置 API_KEY")
 
-    model = OpenAIModel(
-        model_id=cfg["model"],
-        api_base=cfg["base_url"],
-        api_key=cfg["api_key"],
-        temperature=0.0,
-    )
+    model_kwargs: dict = {
+        "model_id": cfg["model"],
+        "api_base": cfg["base_url"],
+        "api_key": cfg["api_key"],
+        "temperature": 0.0,
+    }
+    if enable_thinking:
+        model_kwargs.update(build_thinking_kwargs())
 
-    return ToolCallingAgent(
-        tools=build_sql_tools(db_id, question_id),
-        model=model,
-        max_steps=max_steps,
-        planning_interval=planning_interval,
-        verbosity_level=2,
-    )
+    model = OpenAIModel(**model_kwargs)
+
+    agent_kwargs: dict = {
+        "tools": build_sql_tools(db_id, question_id),
+        "model": model,
+        "max_steps": max_steps,
+        "planning_interval": planning_interval,
+        "verbosity_level": 2,
+        "prompt_templates": _load_agent_prompt_templates(),
+    }
+    if logger is not None:
+        agent_kwargs["logger"] = logger
+    return ToolCallingAgent(**agent_kwargs)
 
 
 def _eval_output_filename(model: str | None = None) -> str:
@@ -308,6 +395,15 @@ def build_task(question: str, db_id: str, evidence: str | None = None) -> str:
     parts = [
         f"You are working with SQLite database '{db_id}'.",
         "Use the provided tools to explore schema, run SQL, and answer the question.",
+        "",
+        "IMPORTANT SQL Guidelines:",
+        "  1. Date format: ALWAYS use 'YYYY-MM-DD' or 'YYYYMM' (integer).",
+        "  2. Output columns: Only include columns requested in the question, no extra columns.",
+        "  3. Aggregation: For ratios/percentages, use CAST(SUM(CASE WHEN ...) AS REAL) / COUNT(...).",
+        "  4. Age calculation: Use CAST((JULIANDAY('now') - JULIANDAY(birthdate)) / 365.25 AS INTEGER).",
+        "  5. Verify enum values by running sample queries first - don't assume values like '-', '+-', check if they are 'negative', '0', etc.",
+        "  6. When question asks for count/ratio/percentage, return just the single numeric value.",
+        "",
         (
             "Before calling final_answer, you MUST call record_final_sql with "
             "the final SELECT SQL that produces the answer."
@@ -336,6 +432,9 @@ def run_one_sample(
     *,
     max_steps: int,
     planning_interval: int | None,
+    enable_thinking: bool = True,
+    enable_log: bool = True,
+    mirror_log_to_terminal: bool = False,
 ) -> tuple[int, bool, str | None]:
     """运行单题，返回 (question_id, succeeded, error_msg)。"""
     question_id = sample["question_id"]
@@ -343,12 +442,20 @@ def run_one_sample(
     question = sample["question"]
     evidence = sample.get("evidence") or None
 
+    log_session: QuestionLogSession | None = None
+    if enable_log:
+        log_session = _start_question_log(
+            question_id, mirror_terminal=mirror_log_to_terminal
+        )
+
     try:
         agent = build_agent(
             db_id,
             question_id,
             max_steps=max_steps,
             planning_interval=planning_interval,
+            logger=log_session.logger if log_session else None,
+            enable_thinking=enable_thinking,
         )
         result = run_question(
             agent,
@@ -356,14 +463,21 @@ def run_one_sample(
             db_id=db_id,
             evidence=evidence,
         )
-        print(f"[question_id={question_id}] 答案: {result}")
+        if log_session:
+            log_session.log_line(f"[question_id={question_id}] 答案: {result}")
+        else:
+            print(f"[question_id={question_id}] 答案: {result}")
         return question_id, True, None
     except Exception as e:
-        print(
-            f"[question_id={question_id}] 失败: {e}",
-            file=sys.stderr,
-        )
+        msg = f"[question_id={question_id}] 失败: {e}"
+        if log_session:
+            log_session.log_line(msg)
+        else:
+            print(msg, file=sys.stderr)
         return question_id, False, str(e)
+    finally:
+        if enable_log:
+            _end_question_log()
 
 
 def run_all_samples(
@@ -371,6 +485,7 @@ def run_all_samples(
     *,
     max_steps: int,
     planning_interval: int | None,
+    enable_thinking: bool = True,
     workers: int = 1,
 ) -> tuple[int, int]:
     total = len(samples)
@@ -389,6 +504,8 @@ def run_all_samples(
                 sample,
                 max_steps=max_steps,
                 planning_interval=planning_interval,
+                enable_thinking=enable_thinking,
+                mirror_log_to_terminal=True,
             )
             if ok:
                 succeeded += 1
@@ -404,6 +521,9 @@ def run_all_samples(
                 sample,
                 max_steps=max_steps,
                 planning_interval=planning_interval,
+                enable_thinking=enable_thinking,
+                enable_log=True,
+                mirror_log_to_terminal=False,
             ): sample
             for sample in samples
         }
@@ -455,6 +575,11 @@ def main():
         help="批量并行线程数（仅 --question all），1 为串行；过高可能触发 API 限流",
     )
     parser.add_argument(
+        "--no-thinking",
+        action="store_true",
+        help="关闭 LLM thinking/reasoning 模式",
+    )
+    parser.add_argument(
         "--no-export",
         action="store_true",
         help="运行结束后不导出 exp_result/agent_out 评估 JSON",
@@ -464,16 +589,12 @@ def main():
     if args.sample is not None and args.question == "all":
         raise SystemExit("--sample 与 --question all 不能同时使用")
 
-    orig_stdout, orig_stderr = setup_run_logging()
-    try:
-        _run_main(args)
-    finally:
-        teardown_run_logging(orig_stdout, orig_stderr)
+    _run_main(args)
 
 
 def _run_main(args: argparse.Namespace) -> None:
     print(f"模型: {get_llm_config()['model']}")
-    print(f"日志: {RUN_AGENT_LOG}")
+    print(f"日志目录: {RUN_AGENT_LOG_DIR}")
 
     if args.question == "all":
         samples = load_dev_samples(args.db_id)
@@ -487,6 +608,7 @@ def _run_main(args: argparse.Namespace) -> None:
             samples,
             max_steps=args.max_steps,
             planning_interval=args.planning_interval,
+            enable_thinking=not args.no_thinking,
             workers=args.workers,
         )
 
@@ -517,22 +639,21 @@ def _run_main(args: argparse.Namespace) -> None:
     print(f"数据库: {db_id}")
     print(f"问题:   {question}\n")
 
-    agent = build_agent(
-        db_id,
-        question_id,
+    sample = {
+        "question_id": question_id,
+        "db_id": db_id,
+        "question": question,
+        "evidence": evidence or None,
+    }
+    _, ok, err = run_one_sample(
+        sample,
         max_steps=args.max_steps,
         planning_interval=args.planning_interval,
+        enable_thinking=not args.no_thinking,
+        mirror_log_to_terminal=True,
     )
-    result = run_question(
-        agent,
-        question=question,
-        db_id=db_id,
-        evidence=evidence or None,
-    )
-
-    print("\n" + "=" * 50)
-    print("最终答案:")
-    print(result)
+    if not ok:
+        raise SystemExit(err or "运行失败")
 
     if not args.no_export:
         export_predictions_for_eval()

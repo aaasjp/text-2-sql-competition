@@ -36,7 +36,7 @@ python working/smolagent_demo.py \
 
 
 # smolagent Text2SQL（working/smolagent_text2sql.py）
-# 执行日志: working/run_agent.log（含 agent 步骤与终端输出）
+# 执行日志: working/logs/run_agent_{question_id}.log（并行时每题独立文件；串行时同时镜像终端）
 # 中间结果: working/predictions/prediction_sql.json
 # 运行结束后自动导出评估 JSON: exp_result/agent_out/predict_mini_dev_dev_{MODEL}_cot_SQLite.json
 
